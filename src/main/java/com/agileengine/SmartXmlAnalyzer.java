@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.agileengine.args.ParsedArgs;
 import com.agileengine.exceptions.ArgumentsException;
-import com.agileengine.exceptions.OriginalElementNotFoundException;
+import com.agileengine.exceptions.XmlAnalyzerException;
 import com.agileengine.xmlanalyzer.XmlAnalyzer;
 
 public class SmartXmlAnalyzer {
@@ -45,8 +45,8 @@ public class SmartXmlAnalyzer {
 		} catch (ArgumentsException e) {
 			LOGGER.error("Invalid Arguments");			
 			e.printStackTrace();
-		} catch (OriginalElementNotFoundException e) {
-			LOGGER.error("Original Element not found");
+		} catch (XmlAnalyzerException e) {
+
 			e.printStackTrace();
 		}
 		

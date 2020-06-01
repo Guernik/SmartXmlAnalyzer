@@ -4,20 +4,21 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.agileengine.args.ParsedArgs;
+import com.agileengine.exceptions.HtmlFileParsingException;
 import com.agileengine.exceptions.OriginalElementNotFoundException;
+import com.agileengine.exceptions.XmlAnalyzerException;
 
 public class XmlAnalyzer {
-	private static final Double HIERARCHY_MAX_SCORE = 0.35d;
-	private static final Double CLASS_LIST_MAX_SCORE = 0.15d;
-	private static final Double TAG_TYPE_MAX_SCORE = 0.35d;
-	private static final Double INNER_TEXT_MAX_SCORE = 0.15d;
+	
 	
 
 	private static Logger LOGGER = LoggerFactory.getLogger(XmlAnalyzer.class);
@@ -28,14 +29,21 @@ public class XmlAnalyzer {
 		this.parsed = parsed;
 	}
 
-	public String obtainTargetXPath() throws OriginalElementNotFoundException {
+	public String obtainTargetXPath() throws XmlAnalyzerException {
 		
 		// parse original file and get attrs from id
-		Optional<Element> originalElementOpt = findElementById(parsed.getOriginalFilePath(), parsed.getOriginalId());
-		
+		Optional<Element> originalElementOpt = findElementById(parsed.getOriginalFilePath(), parsed.getOriginalId());		
 		Element originalElement = originalElementOpt.orElseThrow(() -> new OriginalElementNotFoundException());
 		
-		getHierarchyLevelScore(originalElement, originalElement);
+		Optional<Elements> targetFileElementsOpt = getAllElements(parsed.getDiffFilePath());
+		Elements targetFileElements = targetFileElementsOpt.orElseThrow(() -> new HtmlFileParsingException());
+		
+		
+		Scoring scoring = new Scoring(originalElement);
+		
+		targetFileElements.stream().map( scoring::getElementScore);		
+		
+		
 		
 
 		// parse diff file and get all elements
@@ -46,56 +54,38 @@ public class XmlAnalyzer {
 	}
 	
 	
-	public Integer getIdScore(Element element) {
-		return null;
-	}
-	public Integer getTagTypeScore(Element element) {
-		return null;
-	}	
-	public Integer getClassListScore(Element element) {
-		return null;
-	}
-	
-	/**
-	 * Get a score with the following equation
-	 *  score = 0.35 * e^(-x)
-	 *  where x is the difference in levels between the candidate element and the 
-	 *  original element. (Difference in parent nodes)
-	 *  
-	 *  Default Max score for this function = 0.35
-	 * @param element
-	 * @return
-	 */
-	public Float getHierarchyLevelScore(Element original_element, Element candidate_element) {
-		
-		Integer origParentSize = original_element.parents().size();
-		Integer candidateParentSize = candidate_element.parents().size();
-		LOGGER.info("Original partens: {} -- Candidate parents: {}", origParentSize, candidateParentSize);
-		//original_element.parents().stream().map(Element::tagName).forEach(LOGGER::info);
-		Integer difference = Math.abs(origParentSize - candidateParentSize);
-		Double score = HIERARCHY_MAX_SCORE * Math.exp(-difference);
-		
-		
-		
-		
-		
-		return null;
-	}
-	public Integer getInnerTextScore(Element element) {
-		return null;
-	}
 	
 	
+	
+	
+	private Optional<Elements> getAllElements(File html_file) {
+		
+		try {
+			Elements elements = Jsoup.parse(
+					html_file,
+			        "utf8",
+			        html_file.getAbsolutePath()).getAllElements();
+			return Optional.of(elements);
+		} catch (IOException e) {
+			LOGGER.error("Error reading [{}] file", html_file.getAbsolutePath(), e);
+			return Optional.empty();
+			
+		}
+		
+		
+		
+	}
 	
 	// Copied from provided JsoupFindByIdSnippet.java
 	private Optional<Element> findElementById(File htmlFile, String targetElementId) {
         try {
-            Document doc = Jsoup.parse(
+           Document doc = Jsoup.parse(
                     htmlFile,
                     "utf8",
                     htmlFile.getAbsolutePath());            
 
             return Optional.of(doc.getElementById(targetElementId));
+            
 
         } catch (IOException e) {
             LOGGER.error("Error reading [{}] file", htmlFile.getAbsolutePath(), e);
