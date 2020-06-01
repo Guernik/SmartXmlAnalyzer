@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.agileengine.args.ParsedArgs;
 import com.agileengine.exceptions.ArgumentsException;
+import com.agileengine.exceptions.OriginalElementNotFoundException;
 import com.agileengine.xmlanalyzer.XmlAnalyzer;
 
 public class SmartXmlAnalyzer {
@@ -33,15 +34,19 @@ public class SmartXmlAnalyzer {
 		 try {
 			ParsedArgs parsed = ParsedArgs.parseArgs(args);
 			
-			
 			XmlAnalyzer xml_analyzer = new XmlAnalyzer(parsed);
 			
 			String target_xpath = xml_analyzer.obtainTargetXPath();
 			
 			LOGGER.info("Target xpath obtained: {}", target_xpath);
 			
+		
+		 
 		} catch (ArgumentsException e) {
 			LOGGER.error("Invalid Arguments");			
+			e.printStackTrace();
+		} catch (OriginalElementNotFoundException e) {
+			LOGGER.error("Original Element not found");
 			e.printStackTrace();
 		}
 		
