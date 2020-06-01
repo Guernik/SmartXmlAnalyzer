@@ -13,11 +13,13 @@ public class SmartXmlAnalyzer {
 	 private static Logger LOGGER = LoggerFactory.getLogger(SmartXmlAnalyzer.class);
 
 	public static void main(String[] args) {		
-		String[] test_args = {"make-everything-ok-button", "./samples/sample-0-origin.html", "./samples/sample-1-evil-gemini.html"};
+		String[] test_args1 = {"make-everything-ok-button", "./samples/sample-0-origin.html", "./samples/sample-1-evil-gemini.html"};
+		String[] test_args2 = {"make-everything-ok-button", "./samples/sample-0-origin.html", "./samples/sample-2-container-and-clone.html"};
+		String[] test_args3 = {"make-everything-ok-button", "./samples/sample-0-origin.html", "./samples/sample-3-the-escape.html"};
+		String[] test_args4 = {"make-everything-ok-button", "./samples/sample-0-origin.html", "./samples/sample-4-the-mash.html"};		
+
 		
-//		new SmartXmlAnalyzer().runApp(args);
-		
-		new SmartXmlAnalyzer().runApp(test_args);
+		new SmartXmlAnalyzer().runApp(test_args1);
 		
 		
 		

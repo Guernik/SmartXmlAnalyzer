@@ -19,8 +19,8 @@ public class Scoring {
 	private static Logger LOGGER = LoggerFactory.getLogger(Scoring.class);
 
 	
-	private static final Double HIERARCHY_MAX_SCORE = 0.35d;
-	private static final Double CLASS_LIST_MAX_SCORE = 0.15d;
+	private static final Double HIERARCHY_MAX_SCORE = 0.15d;
+	private static final Double CLASS_LIST_MAX_SCORE = 0.35d;
 	private static final Double TAG_TYPE_MAX_SCORE = 0.35d;
 	private static final Double INNER_TEXT_MAX_SCORE = 0.15d;
 
@@ -63,7 +63,7 @@ public class Scoring {
 		if (sameTag) {
 			score = TAG_TYPE_MAX_SCORE;
 		}
-		
+		LOGGER.debug("Candidate element: {} tag type level score: {}", candidateElement.tagName(),score);
 		return score;
 	}	
 	
@@ -82,14 +82,12 @@ public class Scoring {
 		
 		if (Collections.disjoint(originalElementSet, candidateElementSet)) {
 			score =  0.0d;
-		}		
-		if (candidateElementSet.containsAll(originalElementSet)) {
+		} else if (candidateElementSet.containsAll(originalElementSet)) {
 			score =  CLASS_LIST_MAX_SCORE;
-		}
-		if (originalElementSet.stream().anyMatch(candidateElementSet::contains)) {
+		} else if (originalElementSet.stream().anyMatch(candidateElementSet::contains)) {
 			score = 0.6d * CLASS_LIST_MAX_SCORE;
 		}
-		LOGGER.debug("Candidate element: {} Hierarchy level score: {}", candidateElement.tagName(),score);
+		LOGGER.debug("Candidate element: {} Classlist level score: {}", candidateElement.tagName(),score);
 		return score;
 		
 	}
@@ -124,7 +122,7 @@ public class Scoring {
 	 * If elements have same inner text, returns full score. Returns 0 otherwise
 	 * @return
 	 */
-	public Double getInnerTextScore() {
+	private Double getInnerTextScore() {
 		Boolean sameText = originalElement.ownText().equalsIgnoreCase(candidateElement.ownText());
 		
 		Double score = 0d;
@@ -133,7 +131,7 @@ public class Scoring {
 			score = INNER_TEXT_MAX_SCORE;
 		}
 		
-		LOGGER.debug("Candidate element: {} Hierarchy level score: {}", candidateElement.tagName(),score);
+		LOGGER.debug("Candidate element: {} Inner text level score: {}", candidateElement.tagName(),score);
 		
 		return score;
 	}

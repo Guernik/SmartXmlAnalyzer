@@ -3,7 +3,6 @@ package com.agileengine.xmlanalyzer;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,15 +53,22 @@ public class XmlAnalyzer {
 		
 		ScoredElement winner = list.get(0);
 		
+		scoring.getElementScore(list.get(1).getElement());
+		scoring.getElementScore(winner.getElement());
 		
 		
-		LOGGER.debug("------ Element scoring table: ------");
+		
+		LOGGER.info("------ Element scoring table: ------");
 		list.forEach(e -> {
 			LOGGER.info("Element tag: {} text:{} classes: {} -- Score: {}", e.getElement().tagName(), e.getElement().text(), e.getElement().className(), e.getScore());
 		});
 		
 		
-		LOGGER.info("Winner css path: {}, score: {}", winner.getElement().cssSelector(),winner.getScore());
+		LOGGER.info("Winner tag: {} text:{} classes: {} -- Score: {}",
+				winner.getElement().tagName(),
+				winner.getElement().text(),
+				winner.getElement().className(),
+				winner.getScore());
 		
 		getHtmlPath(winner.getElement());
 		
