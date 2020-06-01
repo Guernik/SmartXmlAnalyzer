@@ -17,14 +17,17 @@ It's easy to tweak the scoring parameters or to add new scoring functions.
     If elements have same href attribute, returns full score. Returns 0 otherwise.    
 
 ### Usage
-    Please note that log4j.xml should be located in same directory as the jar file
-    ```
-    java -jar xmlanalyzer.jar {id} {original_file} {diffcase_file}    
-    ```
-    Sample:
-    ```
-    java -jar xmlanalyzer.jar make-everything-ok-button ./samples/sample-0-origin.html ./samples/sample-1-evil-gemini.html
-    ```
+ Please note that log4j.xml should be located in same directory as the jar file  
+
+ ```
+ java -jar xmlanalyzer.jar {id} {original_file} {diffcase_file}    
+ ```
+
+ Sample:  
+
+ ```
+ java -jar xmlanalyzer.jar make-everything-ok-button ./samples/sample-0-origin.html ./samples/sample-1-evil-gemini.html
+ ```
 
 
 
