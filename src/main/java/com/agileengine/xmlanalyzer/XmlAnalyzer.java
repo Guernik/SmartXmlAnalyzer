@@ -2,8 +2,11 @@ package com.agileengine.xmlanalyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,21 +32,39 @@ public class XmlAnalyzer {
 		this.parsed = parsed;
 	}
 
-	public String obtainTargetXPath() throws XmlAnalyzerException {
+	public String obtainTargetPath() throws XmlAnalyzerException {
 		
 		// parse original file and get attrs from id
 		Optional<Element> originalElementOpt = findElementById(parsed.getOriginalFilePath(), parsed.getOriginalId());		
 		Element originalElement = originalElementOpt.orElseThrow(() -> new OriginalElementNotFoundException());
 		
+		// get candidate elements or throw
 		Optional<Elements> targetFileElementsOpt = getAllElements(parsed.getDiffFilePath());
 		Elements targetFileElements = targetFileElementsOpt.orElseThrow(() -> new HtmlFileParsingException());
 		
 		
 		Scoring scoring = new Scoring(originalElement);
 		
-		targetFileElements.stream().map( scoring::getElementScore);		
+		List<ScoredElement> list = targetFileElements.stream()
+							.map( e -> new ScoredElement(e, scoring.getElementScore(e)))
+							.collect(Collectors.toList());
 		
 		
+		Collections.sort(list, (a,b) -> b.getScore().compareTo(a.getScore()));
+		
+		ScoredElement winner = list.get(0);
+		
+		
+		
+		LOGGER.debug("------ Element scoring table: ------");
+		list.forEach(e -> {
+			LOGGER.info("Element tag: {} text:{} classes: {} -- Score: {}", e.getElement().tagName(), e.getElement().text(), e.getElement().className(), e.getScore());
+		});
+		
+		
+		LOGGER.info("Winner css path: {}, score: {}", winner.getElement().cssSelector(),winner.getScore());
+		
+		getHtmlPath(winner.getElement());
 		
 
 		// parse diff file and get all elements
@@ -58,6 +79,15 @@ public class XmlAnalyzer {
 	
 	
 	
+	private String getHtmlPath(Element element) {
+		String path = "";
+		
+				
+		
+		return path;
+		
+	}
+
 	private Optional<Elements> getAllElements(File html_file) {
 		
 		try {

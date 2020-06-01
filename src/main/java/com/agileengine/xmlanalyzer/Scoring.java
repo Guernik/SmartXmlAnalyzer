@@ -7,6 +7,13 @@ import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Scoring algorithm
+ * 
+ * This could be further optimized defining a score threshold and starting the search at the same level of the original element.
+ * @author Emilio Nahuel
+ *
+ */
 public class Scoring {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(Scoring.class);
@@ -101,7 +108,7 @@ public class Scoring {
 		
 		Integer origParentSize = originalElement.parents().size();
 		Integer candidateParentSize = candidateElement.parents().size();
-		LOGGER.info("Original partens: {} -- Candidate parents: {}", origParentSize, candidateParentSize);
+		LOGGER.debug("Original partens: {} -- Candidate parents: {}", origParentSize, candidateParentSize);
 		//original_element.parents().stream().map(Element::tagName).forEach(LOGGER::info);
 		Integer difference = Math.abs(origParentSize - candidateParentSize);
 		Double score = HIERARCHY_MAX_SCORE * Math.exp(-difference);
@@ -125,6 +132,8 @@ public class Scoring {
 		if (sameText) {
 			score = INNER_TEXT_MAX_SCORE;
 		}
+		
+		LOGGER.debug("Candidate element: {} Hierarchy level score: {}", candidateElement.tagName(),score);
 		
 		return score;
 	}

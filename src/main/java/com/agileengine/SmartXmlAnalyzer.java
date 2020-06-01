@@ -36,7 +36,7 @@ public class SmartXmlAnalyzer {
 			
 			XmlAnalyzer xml_analyzer = new XmlAnalyzer(parsed);
 			
-			String target_xpath = xml_analyzer.obtainTargetXPath();
+			String target_xpath = xml_analyzer.obtainTargetPath();
 			
 			LOGGER.info("Target xpath obtained: {}", target_xpath);
 			
