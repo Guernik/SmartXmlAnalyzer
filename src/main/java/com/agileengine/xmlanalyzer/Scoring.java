@@ -1,5 +1,8 @@
 package com.agileengine.xmlanalyzer;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +59,32 @@ public class Scoring {
 		
 		return score;
 	}	
+	
+	
+	/**
+	 * Return 60% of max score if class list of candidate element contains at least one of the classes
+	 * of the original element.
+	 * Returns 100% of max score if candidate element contains all of the original element classes.
+	 * Retunrs 0 otherwise
+	 * @return
+	 */
 	private Double getClassListScore() {
-		return null;
+		Double score = 0d;
+		Set<String> originalElementSet = originalElement.classNames();
+		Set<String> candidateElementSet = candidateElement.classNames();
+		
+		if (Collections.disjoint(originalElementSet, candidateElementSet)) {
+			score =  0.0d;
+		}		
+		if (candidateElementSet.containsAll(originalElementSet)) {
+			score =  CLASS_LIST_MAX_SCORE;
+		}
+		if (originalElementSet.stream().anyMatch(candidateElementSet::contains)) {
+			score = 0.6d * CLASS_LIST_MAX_SCORE;
+		}
+		LOGGER.debug("Candidate element: {} Hierarchy level score: {}", candidateElement.tagName(),score);
+		return score;
+		
 	}
 	
 	/**
@@ -85,8 +112,21 @@ public class Scoring {
 	}
 	
 	
-	public Integer getInnerTextScore() {
-		return null;
+	/**
+	 * TODO: implement some sort of text diference scoring algorithm
+	 * If elements have same inner text, returns full score. Returns 0 otherwise
+	 * @return
+	 */
+	public Double getInnerTextScore() {
+		Boolean sameText = originalElement.ownText().equalsIgnoreCase(candidateElement.ownText());
+		
+		Double score = 0d;
+		
+		if (sameText) {
+			score = INNER_TEXT_MAX_SCORE;
+		}
+		
+		return score;
 	}
 
 }
