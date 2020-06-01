@@ -23,6 +23,8 @@ public class Scoring {
 	private static final Double CLASS_LIST_MAX_SCORE = 0.35d;
 	private static final Double TAG_TYPE_MAX_SCORE = 0.35d;
 	private static final Double INNER_TEXT_MAX_SCORE = 0.15d;
+	private static final Double HREF_MAX_SCORE = 0.15d;
+	
 
 
 	private final Element originalElement;
@@ -40,7 +42,8 @@ public class Scoring {
 		Double score = getTagTypeScore() +
 						getClassListScore() +
 						getHierarchyLevelScore() +
-						getInnerTextScore();
+						getInnerTextScore() + 
+						getHrefScore();
 		
 		return score;
 						
@@ -72,7 +75,7 @@ public class Scoring {
 	 * Return 60% of max score if class list of candidate element contains at least one of the classes
 	 * of the original element.
 	 * Returns 100% of max score if candidate element contains all of the original element classes.
-	 * Retunrs 0 otherwise
+	 * Returns 0 otherwise
 	 * @return
 	 */
 	private Double getClassListScore() {
@@ -118,7 +121,7 @@ public class Scoring {
 	
 	
 	/**
-	 * TODO: implement some sort of text diference scoring algorithm
+	 * TODO: implement some sort of text difference scoring algorithm
 	 * If elements have same inner text, returns full score. Returns 0 otherwise
 	 * @return
 	 */
@@ -129,6 +132,25 @@ public class Scoring {
 		
 		if (sameText) {
 			score = INNER_TEXT_MAX_SCORE;
+		}
+		
+		LOGGER.debug("Candidate element: {} Inner text level score: {}", candidateElement.tagName(),score);
+		
+		return score;
+	}
+	
+	/**
+	 * 
+	 * If elements have same href attribute, returns full score. Returns 0 otherwise
+	 * @return
+	 */
+	private Double getHrefScore() {
+		Boolean sameHref = originalElement.attr("href").equalsIgnoreCase(candidateElement.attr("href"));
+		
+		Double score = 0d;
+		
+		if (sameHref) {
+			score = HREF_MAX_SCORE;
 		}
 		
 		LOGGER.debug("Candidate element: {} Inner text level score: {}", candidateElement.tagName(),score);

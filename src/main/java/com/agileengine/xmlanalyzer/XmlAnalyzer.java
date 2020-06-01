@@ -2,6 +2,7 @@ package com.agileengine.xmlanalyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -70,14 +71,12 @@ public class XmlAnalyzer {
 				winner.getElement().className(),
 				winner.getScore());
 		
-		getHtmlPath(winner.getElement());
 		
-
-		// parse diff file and get all elements
 		
-		//calculate score for each element
+		String path = getHtmlPath(winner.getElement());
+		LOGGER.info("Path: {}", path);
 		
-		return null;
+		return path;
 	}
 	
 	
@@ -85,12 +84,37 @@ public class XmlAnalyzer {
 	
 	
 	
-	private String getHtmlPath(Element element) {
-		String path = "";
+	private String getHtmlPath(Element element ) {
+		List<String> nodes_list = new ArrayList<>();
+		traversePath(element,nodes_list);		
 		
-				
+		Collections.reverse(nodes_list);
+		return nodes_list.stream().collect(Collectors.joining(">"));		
 		
-		return path;
+	}
+
+	private void traversePath(Element element, List<String> nodes_list) {	
+		Element parent = element.parent();
+		
+		if (parent != null && !parent.tagName().equals("#root")) {			
+			String tag_name = element.tagName();
+			Elements sibs = element.siblingElements();
+			// remove all siblings of different tag name
+			sibs.stream().filter(s -> ! s.tagName().equalsIgnoreCase(tag_name)).forEach(e -> e.remove());
+			sibs = element.siblingElements();
+			Integer sib_index = element.elementSiblingIndex();
+			
+			if (sib_index == 0 && sibs.size() == 0) {
+				nodes_list.add(tag_name);
+			} else {
+				sib_index++;
+				nodes_list.add(tag_name + "[" + sib_index + "]");
+			}
+			
+			traversePath(parent,nodes_list);
+		} else {
+			nodes_list.add(element.tagName());
+		}
 		
 	}
 
